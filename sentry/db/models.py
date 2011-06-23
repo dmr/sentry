@@ -218,7 +218,22 @@ class Model(object):
             raise ValueError('%s are not part of the schema for %s' % (', '.join(kwargs.keys()), self.__class__.__name__))
 
     def __eq__(self, other):
-        return type(other) == type(self) and other.pk == self.pk
+        logger.debug(u"eq")
+        return (type(other) == type(self) and
+                other.__dict__.keys() == self.__dict__.keys() and
+                all(getattr(other, key) == getattr(self, key)
+                    for key in self.__dict__.keys()))
+    def __ne__(self, other):
+        logger.debug(u"ne")
+        if type(other) != type(self):
+            return True
+        if any(getattr(other, key) != getattr(self, key) \
+                   for key in self.__dict__.keys()):
+            return True
+
+    def __hash__(self):
+        logger.debug(u"hash")
+        return hash(self.pk)
 
     def __setattr__(self, key, value):
         # XXX: is this the best approach for validating attributes
