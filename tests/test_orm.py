@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from . import BaseTest
 
 from sentry.db import models
@@ -135,3 +137,37 @@ class ORMTest(BaseTest):
         self.assertEquals(inst.int_, 0)
         self.assertEquals(inst.float_, 1.0)
         self.assertEquals(len(inst.list_), 0)
+
+
+
+import unittest2
+
+class TestModel(unittest2.TestCase):
+    def setUp(self):
+        class Sample(models.Model):
+            attr1 = models.String()
+            attr2 = models.String()
+            class Meta:
+                manager = ldtools.Manager
+
+        self.p1 = Sample(attr1=u"hü", attr2=u"vä")
+        self.p2 = Sample(attr1=u"hü", attr2=u"vä")
+        self.p3 = Sample(attr1=u"hüa", attr2=u"vä")
+
+    def test_hash1(self):
+        logging.info("h1")
+        sett=set([self.p1, self.p2])
+        logging.info("h11")
+        self.assertIn(self.p1, sett)
+
+    def test_hash2(self):
+        logging.info("h2")
+        self.assertNotIn(self.p3, set([self.p1, self.p2]))
+
+    def test_equivalence1(self):
+        logging.info("e1")
+        self.assertEquals(self.p1, self.p2)
+
+    def test_equivalence2(self):
+        logging.info("e2")
+        self.assertNotEquals(self.p1, self.p3)
